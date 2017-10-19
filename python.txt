@@ -12,3 +12,6 @@ http://www.pythonsite.com/?cat=31&paged=3
 
 
 http://httpbin.org/
+
+Âó×ÓÑ§Ôº
+http://www.maiziedu.com/wiki/crawler/step/
