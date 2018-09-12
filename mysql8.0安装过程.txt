@@ -1,0 +1,106 @@
+1. 目前mysql8.11版本, 只能在官网下载zip格式
+	将 zip 包解压到相应的目录，这里我将解压后的文件夹放在 C:\web\mysql-8.0.11 下。
+	接下来我们需要配置下 MySQL 的配置文件
+	打开刚刚解压的文件夹 C:\web\mysql-8.0.11 ，在该文件夹下创建 my.ini 配置文件，编辑 my.ini 配置以下基本信息：
+
+[mysql]
+# 设置mysql客户端默认字符集
+default-character-set=utf8
+ 
+[mysqld]
+# 设置3306端口
+port = 3306
+# 设置mysql的安装目录
+basedir=C:\web\mysql-8.0.11
+# 设置mysql数据库的数据的存放目录
+datadir=C:\web\sqldata
+# 允许最大连接数
+max_connections=20
+# 服务端使用的字符集默认为8比特编码的latin1字符集
+character-set-server=utf8
+# 创建新表时将使用的默认存储引擎
+default-storage-engine=INNODB
+
+
+	接下来我们来启动下 MySQL 数据库：
+
+	以管理员身份打开 cmd 命令行工具，切换目录：
+
+	cd C:\web\mysql-8.0.11\bin
+	初始化数据库：
+
+	mysqld --initialize --console
+	执行完成后，会输出 root 用户的初始默认密码，如：
+
+	...
+	2018-04-20T02:35:05.464644Z 5 [Note] [MY-010454] [Server] A temporary password is generated for root@localhost: APWCY5ws&hjQ
+	...
+	APWCY5ws&hjQ 就是初始密码，后续登录需要用到，你也可以在登陆后修改密码。
+
+	输入以下安装命令：
+
+	mysqld install
+	启动输入以下命令即可：
+
+	net start mysql
+	
+2. 修改mysql密码  https://www.jb51.net/article/142025.htm
+
+	1. 查询用户密码:
+
+		查询用户密码命令：mysql> select host,user,authentication_string from mysql.user;
+
+		host: 允许用户登录的ip‘位置'%表示可以远程；
+
+		user:当前数据库的用户名；
+
+		authentication_string: 用户密码（后面有提到此字段）；
+
+
+2. 设置（或修改）root用户密码：
+
+	默认root密码为空的话 ，下面使用navicat就无法连接，所以我们需要修改root的密码。
+
+	这是很关键的一步。此处踩过N多坑，后来查阅很多才知道在mysql 5.7.9以后废弃了password字段和password()函数；authentication_string:字段表示用户密码。
+
+
+	下面直接演示正确修改root密码的步骤：
+
+	　　一、如果当前root用户authentication_string字段下有内容，先将其设置为空，否则直接进行二步骤。
+
+		use mysql;  
+		update user set authentication_string='' where user='root' 
+		
+		二、使用ALTER修改root用户密码,方法为 ALTER user 'root'@'localhost' IDENTIFIED BY '新密码'。如下：
+
+		ALTER user 'root'@'localhost' IDENTIFIED BY 'Cliu123#' 
+	　　此处有两点需要注意：
+
+		1、不需要flush privileges来刷新权限。
+
+		2、密码要包含大写字母，小写字母，数字，特殊符号。(实际"123456"也行)
+
+		　　修改成功； 重新使用用户名密码登录即可；
+
+3. 远程连接
+	在MySQL 8.04前，执行：SET PASSWORD=PASSWORD('[新密码]');但是MySQL8.0.4开始，这样默认是不行的。因为之前，MySQL的密码认证插件是“mysql_native_password”，而现在使用的是“caching_sha2_password”。
+
+	so,我们这里需要再次修改一次root密码。
+
+	先登录进入mysql环境：执行下面三个命令。（记得带上分号）
+	
+	use mysql； 
+	ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '新密码'; 
+	FLUSH PRIVILEGES; 
+
+
+
+
+	　
+	
+
+
+
+
+
+	
