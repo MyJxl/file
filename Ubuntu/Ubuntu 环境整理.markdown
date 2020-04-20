@@ -120,3 +120,8 @@ jiexl@Virtual:~$ ls -l | grep code
 drwxrwxrwx 2 root  root     0 11月 24 18:51 code
 ```
 
+当挂载CIFS文件系统(如samba)时，挂载目录的owner为root用户（只能以root用户mount）。作为普通用户，只具有读的权限。为了让普通用户具有对挂载文件夹的读写权限，需要挂载的时候指定挂载文件夹的owner和group。这样，被指定的用户就具有对共享文件夹的读写权限。
+
+```
+sudo mount -t cifs //192.168.41.1/code /home/jiexl/code -o username=JIEXL,gid="1000",uid="1000",iocharset=utf8,rw,file_mode=0777,dir_mode=0777,soft,user,noperm
+```
